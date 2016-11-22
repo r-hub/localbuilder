@@ -25,22 +25,9 @@ Rscript -e 'source("https://install-github.me/r-hub/sysreqs")'
     fi
 )
 
-# Install package
-R CMD INSTALL $package
-
-# Create binary snapshot from it
-bindir=$(Rscript -e 'd <- system.file(package="'$package'"); cat(d)')
-version=$(Rscript -e 'v <- packageVersion("'$package'"); cat(as.character(v))')
-tar czf ${package}_${version}.tgz -C $(dirname $bindir) $package
+# Install package and create a binary from it
+R CMD INSTALL --build $package
 
 # Put down the filename in a file
-echo ${package}_${version}.tgz > output_file
-
-# Test loading it
-rm -rf $bindir
-R CMD INSTALL ${package}_${version}.tgz
-if R -e 'library('$package')'; then
-    exit 0
-else
-    exit 1
-fi
+rm $pkgfile
+echo ${package}_${version}*.tar.gz > output_file
