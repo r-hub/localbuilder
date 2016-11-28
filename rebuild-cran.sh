@@ -39,7 +39,7 @@ for pkg in $pkgs; do
 	echo "already built"
     else
 	echo "building"
-	./make-binary-package.sh $image $pkg $repourl 2>&1 >> build.log
+	./make-binary-package.sh "$image" "$pkg" "$repourl"
     fi
 
     x=$(($x + 1))
