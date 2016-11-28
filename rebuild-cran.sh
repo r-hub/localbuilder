@@ -4,8 +4,6 @@ usage() {
     echo "Usage: $0 <image> <repodir>"
 }
 
-set -ex
-
 image=$1
 repodir=$2
 

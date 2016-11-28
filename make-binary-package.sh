@@ -4,7 +4,7 @@ usage() {
     echo "Usage: $0 <image> <package> <repo-url>"
 }
 
-set -ex
+set -e
 
 image=$1
 package=$2
@@ -18,7 +18,7 @@ contid=$(cat /dev/urandom | LC_CTYPE=C  tr -dc 'a-zA-Z0-9' |
 dir=$(pwd)
 echo "Starting container"
 docker run -t -v "${dir}/build-in-docker.sh":/build-in-docker.sh \
-       -v $repo:/cran --name $contid ${image} \
+       -v "${dir}/$repo":/cran --name $contid ${image} \
        bash /build-in-docker.sh ${package}
 
 ## Get exit status
