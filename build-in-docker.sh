@@ -25,6 +25,10 @@ tar xzf $pkgfile
 echo "Installing sysreqs package"
 Rscript -e 'source("https://install-github.me/r-hub/sysreqs")'
 
+# Install remotes package
+echo "Installing remotes package"
+Rscript -e 'source("https://install-github.me/mangothecat/remotes")'
+
 # Get system requirements
 echo "Querying system requirements"
 (
@@ -41,8 +45,8 @@ echo "Querying system requirements"
 )
 
 # Install package and create a binary from it
-echo "Installing package (and building binary)"
-R CMD INSTALL --build $package
+echo "Installing dependencies, package (and building binary)"
+Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
 
 # Put down the filename in a file
 rm $pkgfile
