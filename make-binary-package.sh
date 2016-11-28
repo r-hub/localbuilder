@@ -18,8 +18,8 @@ contid=$(cat /dev/urandom | LC_CTYPE=C  tr -dc 'a-zA-Z0-9' |
 dir=$(pwd)
 echo "Starting container"
 docker run -t -v "${dir}/build-in-docker.sh":/build-in-docker.sh \
-       --name $contid ${image} \
-       bash /build-in-docker.sh ${package} ${repo}
+       -v $repo:/cran --name $contid ${image} \
+       bash /build-in-docker.sh ${package}
 
 ## Get exit status
 status=$(docker inspect $contid | grep ExitCode | cut -d: -f2 | \

@@ -3,7 +3,6 @@
 set -ex
 
 package=$1
-repo=$2
 
 echo "Container running"
 
@@ -40,12 +39,7 @@ echo "Querying system requirements"
 
 # Install package and create a binary from it
 echo "Installing dependencies, package (and building binary)"
-if [ ! -z "$repo" ]; then
-    Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "'$repo'")'
-else
-    echo "Warning: RHUB binary repo was not specified"
-    Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
-fi
+Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "/cran")'
 
 # Put down the filename in a file
 rm $pkgfile
