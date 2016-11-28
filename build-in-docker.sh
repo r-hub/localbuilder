@@ -9,12 +9,6 @@ echo "Container running"
 
 export PATH=$(ls /opt/R-* -d)/bin:$PATH
 echo "options(repos = c(CRAN = \"https://cran.r-hub.io/\"))" >> ~/.Rprofile
-if [ ! -z "$repo" ]; then
-    echo "options(repos = c(RHUB = \""$repo"\", getOption(\"repos\")))" \
-	 >> ~/.Rprofile
-else
-    echo "Warning: RHUB binary repo was not specified"
-fi
 
 # Download source package and extract it
 echo "Downloading source package"
@@ -46,7 +40,12 @@ echo "Querying system requirements"
 
 # Install package and create a binary from it
 echo "Installing dependencies, package (and building binary)"
-Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
+if [ ! -z "$repo" ]; then
+    Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "'$repo'")'
+else
+    echo "Warning: RHUB binary repo was not specified"
+    Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
+fi
 
 # Put down the filename in a file
 rm $pkgfile
