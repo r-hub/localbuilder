@@ -11,6 +11,10 @@ repodir=$2
 
 if [[ -z "$image" || -z "$repodir" ]]; then usage; exit 1; fi
 
+# In case it does not exist or not a proper repo
+mkdir -p $repodir
+Rscript -e 'tools::write_PACKAGES("'$repodir'")'
+
 echo "Installing crandeps package"
 Rscript -e 'source("https://install-github.me/r-hub/crandeps")'
 
