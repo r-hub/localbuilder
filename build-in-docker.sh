@@ -17,7 +17,7 @@ Rscript -e 'source("https://install-github.me/r-hub/sysreqs")'
 # Get system requirements
 (
     cd $package
-    sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands(\"DESCRIPTION\"))")    
+    sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands(\"DESCRIPTION\", soft = FALSE))")
     if [[ ! -z "$sysreqs" ]]; then
 	echo "$sysreqs" > sysreqs.sh
 	chmod +x sysreqs.sh
