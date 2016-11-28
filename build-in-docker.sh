@@ -39,7 +39,7 @@ echo "Querying system requirements"
 
 # Install package and create a binary from it
 echo "Installing dependencies, package (and building binary)"
-Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "/cran")'
+Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "file:///cran")'
 
 # Put down the filename in a file
 rm $pkgfile
