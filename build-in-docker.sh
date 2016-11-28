@@ -3,11 +3,18 @@
 set -e
 
 package=$1
+repo=$2
 
 echo "Container running"
 
 export PATH=$(ls /opt/R-* -d)/bin:$PATH
 echo "options(repos = c(CRAN = \"https://cran.r-hub.io/\"))" >> ~/.Rprofile
+if [ ! -z "$repo" ]; then
+    echo "options(repos = c(RHUB = \""$repo"\", getOption(\"repos\")))" \
+	 >> ~/.Rprofile
+else
+    echo "Warning: RHUB binary repo was not specified"
+fi
 
 # Download source package and extract it
 echo "Downloading source package"

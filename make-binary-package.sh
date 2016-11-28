@@ -1,11 +1,12 @@
 #! /bin/bash
 
 usage() {
-    echo "Usage: $0 <image> <package>"
+    echo "Usage: $0 <image> <package> <repo-url>"
 }
 
 image=$1
 package=$2
+repo=$3
 
 if [[ -z "$image" || -z "$package" ]]; then usage; exit 1; fi
 
@@ -16,7 +17,7 @@ dir=$(pwd)
 echo "Starting container"
 docker run -t -v "${dir}/build-in-docker.sh":/build-in-docker.sh \
        --name $contid ${image} \
-       bash /build-in-docker.sh ${package}
+       bash /build-in-docker.sh ${package} ${repo}
 
 ## Get exit status
 status=$(docker inspect $contid | grep ExitCode | cut -d: -f2 | \
