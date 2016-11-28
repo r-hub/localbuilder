@@ -19,12 +19,12 @@ echo "Installing crandeps package"
 Rscript -e 'source("https://install-github.me/r-hub/crandeps")'
 
 echo "Calculating topological package order"
-pkgs=$(Rscript -e 'cat(crandeps::cran_topo_sort(), sep = "\\n")')
+pkgs=$(Rscript -e 'cat(crandeps::cran_topo_sort())')
 numpkgs=$(echo "$pkgs" | wc -w)
 
 echo "Listing packages already built"
 repourl=$(Rscript -e 'cat(paste0("file://", normalizePath("'$repodir'")))')
-ready=$(Rscript -e 'd <- "'$repourl'"; cat(rownames(available.packages(contriburl = d)), sep = "\\n")')
+ready=$(Rscript -e 'd <- "'$repourl'"; cat(rownames(available.packages(contriburl = d)))')
 numready=$(echo "$ready" | wc -w)
 tobuild=$(($numpkgs - $numready))
 
@@ -35,7 +35,7 @@ echo > build.log
 x=1
 for pkg in $pkgs; do
     echo -n "[$x/$tobuild] $pkg "
-    if echo "$ready" | grep -q '^'$pkg'$'; then
+    if echo "$ready" | grep -q '(^|[ ])'$pkg'($|[ ])'; then
 	echo "already built"
     else
 	echo "building"
