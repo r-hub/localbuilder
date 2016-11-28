@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -e
+set -ex
 
 package=$1
 repo=$2

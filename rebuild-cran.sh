@@ -4,7 +4,7 @@ usage() {
     echo "Usage: $0 <image> <repodir>"
 }
 
-set -e
+set -ex
 
 image=$1
 repodir=$2
@@ -39,7 +39,7 @@ for pkg in $pkgs; do
 	echo "already built"
     else
 	echo "building"
-	./make-binary-package.sh "$image" "$pkg" "$repourl"
+	./make-binary-package.sh "$image" "$pkg" "$repourl" 2>&1 >>build.log
     fi
 
     x=$(($x + 1))

@@ -4,6 +4,8 @@ usage() {
     echo "Usage: $0 <image> <package> <repo-url>"
 }
 
+set -ex
+
 image=$1
 package=$2
 repo=$3
