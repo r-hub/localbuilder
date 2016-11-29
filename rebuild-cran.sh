@@ -36,8 +36,11 @@ for pkg in $pkgs; do
     if echo "$ready" | grep -q '(^|[ ])'$pkg'($|[ ])'; then
 	echo "already built"
     else
-	echo "building"
+	echo -n "building ... "
 	./make-binary-package.sh "$image" "$pkg" "$repodir" 2>&1 >>build.log
+	echo -n "updating repo ... "
+	Rscript -e 'tools::write_PACKAGES("'$repodir'")'
+	echo "DONE"
     fi
 
     x=$(($x + 1))

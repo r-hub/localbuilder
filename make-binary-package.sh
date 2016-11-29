@@ -29,7 +29,7 @@ if [[ "$status" == 0 ]]; then
     echo "Copy binary package from container"
     docker cp "${contid}:output_file" .
     output=$(cat output_file)
-    docker cp "${contid}:${output}" .
+    docker cp "${contid}:${output}" $repo/
     exit 0
 else
     echo "Build failed, no binary package was produced"
