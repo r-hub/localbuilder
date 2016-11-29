@@ -38,6 +38,9 @@ ready=$(Rscript -e 'd <- "'$repourl'"; cat(rownames(available.packages(contribur
 numready=$(echo "$ready" | wc -w)
 tobuild=$(($numpkgs - $numready))
 
+echo "Querying packages with compiled code"
+compiled=$(curl ${NEEDSCOMP_URL} | tr -dc 'a-z.A-Z0-9,' | tr ',' ' ')
+
 echo $numpkgs packages, $numready done, building $tobuild
 
 echo > build.log
@@ -47,6 +50,8 @@ for pkg in $pkgs; do
     echo -n "[$x/$tobuild] $pkg $(date)"
     if echo "$ready" | grep -q '\b'$pkg'\b'; then
 	echo " already built"
+    elif echo "$compiled" | grep -qv '\b'$pkg'\b'; then
+	echo " has no compiled code"
     else
 	echo -n " building ... "
 	if ./make-binary-package.sh "$newimage" "$pkg" "$repodir" 2>&1 >>build.log; then

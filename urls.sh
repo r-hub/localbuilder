@@ -10,3 +10,4 @@ CRAN_MIRROR_URL=https://cran.r-hub.io
 SYSREQS_URL=https://install-github.me/r-hub/sysreqs
 REMOTES_URL=https://install-github.me/mangothecat/remotes
 CRANDEPS_URL=https://install-github.me/r-hub/crandeps
+NEEDSCOMP_URL=http://crandb.r-pkg.org/-/needscompilation
