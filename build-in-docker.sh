@@ -37,10 +37,14 @@ echo "Querying system requirements"
     fi
 )
 
+# Install package dependencies
+echo "Installing dependencies"
+Rscript -e 'remotes::install_deps("'$package'", contriburl = "file:///cran")'
+
 # Install package and create a binary from it
 echo "Installing dependencies, package (and building binary)"
-Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build", contriburl = "file:///cran")'
+Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
 
 # Put down the filename in a file
 rm $pkgfile
-echo ${package}_${version}*.tar.gz > output_file
+echo ${package}_*.tar.gz > output_file
