@@ -15,12 +15,12 @@ pkgfile=$(Rscript -e 'p <- download.packages("'$package'", "."); cat(p[,2])')
 tar xzf $pkgfile
 
 # Install the sysreqs package
-echo "Installing sysreqs package"
-Rscript -e 'source("https://install-github.me/r-hub/sysreqs")'
+echo "Installing sysreqs package (if not installed)"
+Rscript -e 'requireNamespace("sysreqs", quietly = TRUE) || source("https://install-github.me/r-hub/sysreqs")'
 
 # Install remotes package
-echo "Installing remotes package"
-Rscript -e 'source("https://install-github.me/mangothecat/remotes")'
+echo "Installing remotes package (if not installed)"
+Rscript -e 'requireNamespace("remotes", quietly = TRUE) || source("https://install-github.me/mangothecat/remotes")'
 
 # Get system requirements
 echo "Querying system requirements"

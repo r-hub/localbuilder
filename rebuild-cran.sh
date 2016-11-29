@@ -16,6 +16,15 @@ Rscript -e 'tools::write_PACKAGES("'$repodir'")'
 echo "Installing crandeps package"
 Rscript -e 'source("https://install-github.me/r-hub/crandeps")'
 
+contid=$(cat /dev/urandom | LC_CTYPE=C  tr -dc 'a-zA-Z0-9' |
+		fold -w 32 | head -n 1)
+
+echo "Creating a custom container"
+docker run -t -v `pwd`/custom-container.sh:/custom-container.sh \
+       --name $contid ${image} bash /custom-container.sh
+
+newimage=$(docker commit $contid)
+
 echo "Calculating topological package order"
 pkgs=$(Rscript -e 'cat(crandeps::cran_topo_sort())')
 numpkgs=$(echo "$pkgs" | wc -w)
@@ -37,7 +46,7 @@ for pkg in $pkgs; do
 	echo "already built"
     else
 	echo -n "building ... "
-	./make-binary-package.sh "$image" "$pkg" "$repodir" 2>&1 >>build.log
+	./make-binary-package.sh "$newimage" "$pkg" "$repodir" 2>&1 >>build.log
 	echo -n "updating repo ... "
 	Rscript -e 'tools::write_PACKAGES("'$repodir'")'
 	echo "DONE"
