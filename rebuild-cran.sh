@@ -43,9 +43,9 @@ x=1
 for pkg in $pkgs; do
     echo -n "[$x/$tobuild] $pkg $(date)"
     if echo "$ready" | grep -q '\b'$pkg'\b'; then
-	echo "already built"
+	echo " already built"
     else
-	echo -n "building ... "
+	echo -n " building ... "
 	if ./make-binary-package.sh "$newimage" "$pkg" "$repodir" 2>&1 >>build.log; then
 	    echo -n "updating repo ... "
 	    Rscript -e 'tools::write_PACKAGES("'$repodir'")'
