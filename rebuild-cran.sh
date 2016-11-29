@@ -46,10 +46,13 @@ for pkg in $pkgs; do
 	echo "already built"
     else
 	echo -n "building ... "
-	./make-binary-package.sh "$newimage" "$pkg" "$repodir" 2>&1 >>build.log
-	echo -n "updating repo ... "
-	Rscript -e 'tools::write_PACKAGES("'$repodir'")'
-	echo "DONE"
+	if ./make-binary-package.sh "$newimage" "$pkg" "$repodir" 2>&1 >>build.log; then
+	    echo -n "updating repo ... "
+	    Rscript -e 'tools::write_PACKAGES("'$repodir'")'
+	    echo "DONE"
+	else
+	    echo "FAILED"
+	fi
     fi
 
     x=$(($x + 1))
