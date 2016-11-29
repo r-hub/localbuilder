@@ -42,7 +42,7 @@ echo > build.log
 x=1
 for pkg in $pkgs; do
     echo -n "[$x/$tobuild] $pkg $(date)"
-    if echo "$ready" | grep -q '(^|[ ])'$pkg'($|[ ])'; then
+    if echo "$ready" | grep -q '\b'$pkg'\b'; then
 	echo "already built"
     else
 	echo -n "building ... "
