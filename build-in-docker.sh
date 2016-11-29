@@ -3,18 +3,13 @@
 set -e
 
 package=$1
-repo=$2
+
+. urls.sh
 
 echo "Container running"
 
 export PATH=$(ls /opt/R-* -d)/bin:$PATH
-echo "options(repos = c(CRAN = \"https://cran.r-hub.io/\"))" >> ~/.Rprofile
-if [ ! -z "$repo" ]; then
-    echo "options(repos = c(RHUB = \""$repo"\", getOption(\"repos\")))" \
-	 >> ~/.Rprofile
-else
-    echo "Warning: RHUB binary repo was not specified"
-fi
+echo "options(repos = c(CRAN = \"${CRAN_MIRROR_URL}/\"))" >> ~/.Rprofile
 
 # Download source package and extract it
 echo "Downloading source package"
@@ -22,12 +17,12 @@ pkgfile=$(Rscript -e 'p <- download.packages("'$package'", "."); cat(p[,2])')
 tar xzf $pkgfile
 
 # Install the sysreqs package
-echo "Installing sysreqs package"
-Rscript -e 'source("https://install-github.me/r-hub/sysreqs")'
+echo "Installing sysreqs package (if not installed)"
+Rscript -e 'if (! requireNamespace("sysreqs", quietly = TRUE)) source("'$SYSREQS_URL'")'
 
 # Install remotes package
-echo "Installing remotes package"
-Rscript -e 'source("https://install-github.me/mangothecat/remotes")'
+echo "Installing remotes package (if not installed)"
+Rscript -e 'if (! requireNamespace("remotes", quietly = TRUE)) source("'$REMOTES_URL'")'
 
 # Get system requirements
 echo "Querying system requirements"
@@ -44,10 +39,15 @@ echo "Querying system requirements"
     fi
 )
 
+# Install package dependencies
+echo "Installing dependencies"
+Rscript -e 'remotes::install_deps("'$package'", contriburl = "file:///cran")'
+
 # Install package and create a binary from it
-echo "Installing dependencies, package (and building binary)"
+echo "Installing package (and building binary)"
 Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
 
 # Put down the filename in a file
 rm $pkgfile
-echo ${package}_${version}*.tar.gz > output_file
+mv ${package}_*.tar.gz $pkgfile || exit 1
+mv $pkgfile /cran
