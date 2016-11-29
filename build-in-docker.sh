@@ -4,10 +4,12 @@ set -e
 
 package=$1
 
+. urls.sh
+
 echo "Container running"
 
 export PATH=$(ls /opt/R-* -d)/bin:$PATH
-echo "options(repos = c(CRAN = \"https://cran.r-hub.io/\"))" >> ~/.Rprofile
+echo "options(repos = c(CRAN = \"${CRAN_MIRROR_URL}/\"))" >> ~/.Rprofile
 
 # Download source package and extract it
 echo "Downloading source package"
@@ -16,11 +18,11 @@ tar xzf $pkgfile
 
 # Install the sysreqs package
 echo "Installing sysreqs package (if not installed)"
-Rscript -e 'if (! requireNamespace("sysreqs", quietly = TRUE)) source("https://install-github.me/r-hub/sysreqs")'
+Rscript -e 'if (! requireNamespace("sysreqs", quietly = TRUE)) source("'$SYSREQS_URL'")'
 
 # Install remotes package
 echo "Installing remotes package (if not installed)"
-Rscript -e 'if (! requireNamespace("remotes", quietly = TRUE)) source("https://install-github.me/mangothecat/remotes")'
+Rscript -e 'if (! requireNamespace("remotes", quietly = TRUE)) source("'$REMOTES_URL'")'
 
 # Get system requirements
 echo "Querying system requirements"

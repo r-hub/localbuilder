@@ -7,6 +7,8 @@ usage() {
 image=$1
 repodir=$2
 
+. urls.sh
+
 if [[ -z "$image" || -z "$repodir" ]]; then usage; exit 1; fi
 
 # In case it does not exist or not a proper repo
@@ -14,13 +16,14 @@ mkdir -p $repodir
 Rscript -e 'tools::write_PACKAGES("'$repodir'")'
 
 echo "Installing crandeps package"
-Rscript -e 'if (!requireNamespace("crandeps", quietly = TRUE)) source("https://install-github.me/r-hub/crandeps")'
+Rscript -e 'if (!requireNamespace("crandeps", quietly = TRUE)) source("'$CRANDEPS_URL'")'
 
 contid=$(cat /dev/urandom | LC_CTYPE=C  tr -dc 'a-zA-Z0-9' |
 		fold -w 32 | head -n 1)
 
 echo "Creating a custom container"
 docker run -t -v `pwd`/custom-container.sh:/custom-container.sh \
+       -v `pwd`/urls.sh:/urls.sh \
        --name $contid ${image} bash /custom-container.sh
 
 newimage=$(docker commit $contid)
