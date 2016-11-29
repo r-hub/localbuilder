@@ -44,9 +44,10 @@ echo "Installing dependencies"
 Rscript -e 'remotes::install_deps("'$package'", contriburl = "file:///cran")'
 
 # Install package and create a binary from it
-echo "Installing dependencies, package (and building binary)"
+echo "Installing package (and building binary)"
 Rscript -e 'remotes::install_local("'$package'", INSTALL_opts = "--build")'
 
 # Put down the filename in a file
 rm $pkgfile
-echo ${package}_*.tar.gz > output_file
+mv ${package}_*.tar.gz $pkgfile || exit 1
+mv $pkgfile /cran
