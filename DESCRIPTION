@@ -1,0 +1,14 @@
+Package: localbuilder
+Title: Build R Binary Packages for Multiple Platforms
+Version: 0.0.0.9000
+Author: Gábor Csárdi
+Maintainer: Gábor Csárdi <csardi.gabor@gmail.com>
+Description: Currently it supports Linux via Docker. It uses R-hub's Docker images to build binary R packages for
+  various platforms.
+License: MIT + file LICENSE
+LazyData: true
+URL: https://github.com/r-hub/localbuilder
+BugReports: https://github.com/r-hub/localbuilder/issues
+RoxygenNote: 5.0.1.9000
+Suggests: 
+    testthat
