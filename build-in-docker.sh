@@ -16,11 +16,11 @@ tar xzf $pkgfile
 
 # Install the sysreqs package
 echo "Installing sysreqs package (if not installed)"
-Rscript -e 'requireNamespace("sysreqs", quietly = TRUE) || source("https://install-github.me/r-hub/sysreqs")'
+Rscript -e 'if (! requireNamespace("sysreqs", quietly = TRUE)) source("https://install-github.me/r-hub/sysreqs")'
 
 # Install remotes package
 echo "Installing remotes package (if not installed)"
-Rscript -e 'requireNamespace("remotes", quietly = TRUE) || source("https://install-github.me/mangothecat/remotes")'
+Rscript -e 'if (! requireNamespace("remotes", quietly = TRUE)) source("https://install-github.me/mangothecat/remotes")'
 
 # Get system requirements
 echo "Querying system requirements"

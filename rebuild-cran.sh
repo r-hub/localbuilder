@@ -14,7 +14,7 @@ mkdir -p $repodir
 Rscript -e 'tools::write_PACKAGES("'$repodir'")'
 
 echo "Installing crandeps package"
-Rscript -e 'requireNamespace("crandeps", quietly = TRUE) || source("https://install-github.me/r-hub/crandeps")'
+Rscript -e 'if (!requireNamespace("crandeps", quietly = TRUE)) source("https://install-github.me/r-hub/crandeps")'
 
 contid=$(cat /dev/urandom | LC_CTYPE=C  tr -dc 'a-zA-Z0-9' |
 		fold -w 32 | head -n 1)
