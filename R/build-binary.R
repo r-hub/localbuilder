@@ -7,8 +7,7 @@ build_linux_binary <- function(
   path = ".",
   image = "rhub/ubuntu-gcc-release",
   platform = NULL,
-  docker_user = "docker",
-  verbose = TRUE) {
+  docker_user = "docker") {
 
   cleanme <- character()
   on.exit(
@@ -17,46 +16,56 @@ build_linux_binary <- function(
   )
 
   ## Make sure that the image is available
-  if (verbose) cat("* Getting docker image\n")
+  message("* Getting docker image ............. ", appendLF = FALSE)
   image_id <- docker_ensure_image(image)
+  message(substring(image_id, 1, 7))
 
   ## Get the R-hub platform id from the image, we need this to query the
   ## system reqirements for the platform
-  if (verbose) cat("* Querying platform\n")
+  message("* Querying platform ................ ", appendLF = FALSE)
   platform <- platform %||% get_platform(image_id)
+  message(platform)
 
   ## Query system requirements
-  if (verbose) cat("* Querying system requirements\n")
+  message("* Querying system requirements ..... ", appendLF = FALSE)
   sysreqs <- get_system_requirements(path, platform)
+  message("DONE")
 
   ## Install system requirements, create new image
-  if (verbose) cat("* Installing system requirements\n")
+  message("* Installing system requirements ... ", , appendLF = FALSE)
   prov_image_id <- install_system_requirements(image_id, sysreqs)
   cleanme <- c(cleanme, prov_image_id)
+  message(substring(prov_image_id, 1, 7))
 
   ## Setup R, create package library directory, profile, etc.
-  if (verbose) cat("* Setting up R environment\n")
+  message("* Setting up R environment ......... ", appendLF = FALSE)
   setup_image_id <- setup_for_r(prov_image_id, user = docker_user)
   cleanme <- c(cleanme, setup_image_id)
+  message(substring(setup_image_id, 1, 7))
 
   ## Install dependent R packages, create new image
-  if (verbose) cat("* Installing dependencies\n")
+  message("* Installing dependencies .......... ", appendLF = FALSE)
   dep_image_id <- install_deps(path, setup_image_id, user = docker_user,
                                dependencies = TRUE)
   cleanme <- c(cleanme, dep_image_id)
+  message(substring(dep_image_id, 1, 7))
 
   ## System information
-  if (verbose) cat("* Querying system information\n")
+  message("* Querying system information ...... ", appendLF = FALSE)
   system_information(path, dep_image_id)
+  message("DONE")
 
   ## Run the check
-  if (verbose) cat("* Running check\n")
-  finished_image_id <- run_check(path, dep_image_id, user = docker_user)
+  message("* Running check .................... ", appendLF = FALSE)
+  finished_image_id <- run_check(path, dep_image_id, user = docker_user,
+                                 args = "--build")
   cleanme <- c(cleanme, finished_image_id)
+  message(substring(finished_image_id, 1, 7))
 
   ## Save the built binary to a repository, optionally
-  if (verbose) cat("* Saving binary\n")
-  save_binary_to_repo(path, finished_image_id)
+  message("* Saving binary .................... ", appendLF = FALSE)
+  save_binary_to_repo(path, finished_image_id, user = docker_user)
+  message("DONE")
 }
 
 get_platform <- function(image_id) {
