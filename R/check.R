@@ -1,5 +1,7 @@
 
-run_check <- function(path, image_id, user) {
+run_check <- function(path, image_id, user, args) {
+
+  args <- paste(args, collapse = " ")
 
   pkg_vol <- sprintf("%s:/%s", normalizePath(path), basename(path))
 
@@ -13,7 +15,7 @@ run_check <- function(path, image_id, user) {
     workdir = paste0("/home/", user),
     volumes = pkg_vol,
     command = c("bash", "-l", "-c",
-      sprintf("$RBINARY CMD check -l ~/R /%s", basename(path)))
+      sprintf("$RBINARY CMD check -l ~/R %s /%s", args, basename(path)))
   )
 
   new_image_id <- random_id()
