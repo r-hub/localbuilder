@@ -10,6 +10,9 @@ LazyData: true
 URL: https://github.com/r-hub/localbuilder
 BugReports: https://github.com/r-hub/localbuilder/issues
 RoxygenNote: 5.0.1.9000
+Imports:
+    processx,
+    whisker
 Suggests: 
     testthat
 Encoding: UTF-8
