@@ -13,6 +13,7 @@ docker_ensure_image <- function(image) {
   if (! docker_image_available(image)) {
     docker("pull", image)
   }
+  image
 }
 
 docker_run <- function(image, command, options = NULL, rm = FALSE,
