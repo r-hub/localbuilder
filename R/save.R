@@ -1,5 +1,5 @@
 
-save_binary_to_repo <- function(path, container_id, user) {
+save_binary_to_repo <- function(path, image_id, user) {
 
   ## List files in the container, and the copy out what we need
   new_id <- random_id()

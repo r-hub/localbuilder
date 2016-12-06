@@ -18,7 +18,7 @@ build_linux_binary <- function(
   ## Make sure that the image is available
   message("* Getting docker image ............. ", appendLF = FALSE)
   image_id <- docker_ensure_image(image)
-  message(substring(image_id, 1, 20))
+  message(substring(image_id, 1, 40))
 
   ## Get the R-hub platform id from the image, we need this to query the
   ## system reqirements for the platform
@@ -35,20 +35,20 @@ build_linux_binary <- function(
   message("* Installing system requirements ... ", appendLF = FALSE)
   prov_image_id <- install_system_requirements(image_id, sysreqs)
   cleanme <- c(cleanme, prov_image_id)
-  message(substring(prov_image_id, 1, 20))
+  message(substring(prov_image_id, 1, 40))
 
   ## Setup R, create package library directory, profile, etc.
   message("* Setting up R environment ......... ", appendLF = FALSE)
   setup_image_id <- setup_for_r(prov_image_id, user = docker_user)
   cleanme <- c(cleanme, setup_image_id)
-  message(substring(setup_image_id, 1, 20))
+  message(substring(setup_image_id, 1, 40))
 
   ## Install dependent R packages, create new image
   message("* Installing dependencies .......... ", appendLF = FALSE)
   dep_image_id <- install_deps(path, setup_image_id, user = docker_user,
                                dependencies = TRUE)
   cleanme <- c(cleanme, dep_image_id)
-  message(substring(dep_image_id, 1, 20))
+  message(substring(dep_image_id, 1, 40))
 
   ## System information
   message("* Querying system information ...... ", appendLF = FALSE)
@@ -60,7 +60,7 @@ build_linux_binary <- function(
   finished_image_id <- run_check(path, dep_image_id, user = docker_user,
                                  args = "--build")
   cleanme <- c(cleanme, finished_image_id)
-  message(substring(finished_image_id, 1, 20))
+  message(substring(finished_image_id, 1, 40))
 
   ## Save the built binary to a repository, optionally
   message("* Saving binary .................... ", appendLF = FALSE)
