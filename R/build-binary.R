@@ -10,7 +10,10 @@ build_linux_binary <- function(
   docker_user = "docker") {
 
   cleanme <- character()
-  on.exit(docker_rmi(setdiff(unique(cleanme), image)), add = TRUE)
+  on.exit(
+    try(docker_rmi(setdiff(unique(cleanme), image))),
+    add = TRUE
+  )
 
   ## Make sure that the image is available
   image_id <- docker_ensure_image(image)
