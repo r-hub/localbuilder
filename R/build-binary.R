@@ -32,7 +32,7 @@ build_linux_binary <- function(
   message("DONE")
 
   ## Install system requirements, create new image
-  message("* Installing system requirements ... ", , appendLF = FALSE)
+  message("* Installing system requirements ... ", appendLF = FALSE)
   prov_image_id <- install_system_requirements(image_id, sysreqs)
   cleanme <- c(cleanme, prov_image_id)
   message(substring(prov_image_id, 1, 7))
