@@ -12,7 +12,7 @@ build_linux_binary <- function(
 
   cleanme <- character()
   on.exit(
-    try(docker_rmi(setdiff(unique(cleanme), image))),
+    try(docker_rmi(setdiff(unique(cleanme), image)), silent = TRUE),
     add = TRUE
   )
 
