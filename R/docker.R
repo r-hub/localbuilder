@@ -2,7 +2,7 @@
 #' @importFrom processx run
 
 docker <- function(...) {
-  run("docker", unlist(list(...)), echo = is_debugged(), spinner = TRUE)
+  run("docker", unlist(list(...)), echo = is_debugged())
 }
 
 docker_image_available <- function(image) {
