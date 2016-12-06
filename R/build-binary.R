@@ -9,6 +9,9 @@ build_linux_binary <- function(
   platform = NULL,
   docker_user = "docker") {
 
+  cleanme <- character()
+  on.exit(docker_rmi(setdiff(unique(cleanme), image)), add = TRUE)
+
   ## Make sure that the image is available
   image_id <- docker_ensure_image(image)
 
@@ -21,31 +24,26 @@ build_linux_binary <- function(
 
   ## Install system requirements, create new image
   prov_image_id <- install_system_requirements(image_id, sysreqs)
-  if (image_id != prov_image_id) {
-    on.exit(docker_rmi(prov_image_id), add = TRUE)
-  }
+  cleanme <- c(cleanme, prov_image_id)
 
   ## Setup R, create package library directory, profile, etc.
   setup_image_id <- setup_for_r(prov_image_id, user = docker_user)
-  if (setup_image_id != prov_image_id) {
-    on.exit(docker_rmi(setup_image_id), add = TRUE)
-  }
+  cleanme <- c(cleanme, setup_image_id)
 
   ## Install dependent R packages, create new image
   dep_image_id <- install_deps(path, setup_image_id, user = docker_user,
                                dependencies = TRUE)
-  if (dep_image_id != setup_image_id) {
-    on.exit(docker_rmi(dep_image_id), add = TRUE)
-  }
+  cleanme <- c(cleanme, dep_image_id)
 
   ## System information
   system_information(path, dep_image_id)
 
   ## Run the check
-  finished_cont_id <- run_check(path, dep_image_id, user = docker_user)
+  finished_image_id <- run_check(path, dep_image_id, user = docker_user)
+  cleanme <- c(cleanme, finished_image_id)
 
   ## Save the built binary to a repository, optionally
-  save_binary_to_repo(path, finished_cont_id)
+  save_binary_to_repo(path, finished_image_id)
 }
 
 get_platform <- function(image_id) {

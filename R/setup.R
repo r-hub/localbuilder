@@ -11,7 +11,7 @@ setup_for_r <- function(image_id, user, repos = NULL) {
     "cran-repo" = repos
   )
   shfile <- do_template("setup.sh", template_data)
-  #on.exit(unlink(shfile), add = TRUE)
+  on.exit(unlink(shfile), add = TRUE)
   shfile_vol <- sprintf("%s:/%s", shfile, basename(shfile))
 
   new_id <- random_id()
