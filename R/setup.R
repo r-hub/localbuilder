@@ -1,7 +1,7 @@
 
 #' @importFrom whisker whisker.render
 
-setup_for_r <- function(image_id, user = "docker", repos = NULL) {
+setup_for_r <- function(image_id, user, repos = NULL) {
 
   if (is.null(repos)) repos <- Sys.getenv("RHUB_CRAN_REPO", NA_character_)
   if (is.na(repos)) repos <- "https://cran.r-hub.io"

@@ -1,5 +1,5 @@
 
-run_check <- function(path, image_id, user = "docker") {
+run_check <- function(path, image_id, user) {
 
   pkg_vol <- sprintf("%s:/%s", normalizePath(path), basename(path))
 

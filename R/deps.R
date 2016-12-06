@@ -9,8 +9,7 @@
 #'
 #' @keywords internal
 
-install_deps <- function(path, image_id, user = "docker",
-                         dependencies = TRUE) {
+install_deps <- function(path, image_id, user, dependencies) {
 
   ## Create R script to run
   rfile <- tempfile(fileext = ".R")

@@ -26,13 +26,14 @@ build_linux_binary <- function(
   }
 
   ## Setup R, create package library directory, profile, etc.
-  setup_image_id <- setup_for_r(prov_image_id)
+  setup_image_id <- setup_for_r(prov_image_id, user = docker_user)
   if (setup_image_id != prov_image_id) {
     on.exit(docker_rmi(setup_image_id), add = TRUE)
   }
 
   ## Install dependent R packages, create new image
-  dep_image_id <- install_deps(path, setup_image_id)
+  dep_image_id <- install_deps(path, setup_image_id, user = docker_user,
+                               dependencies = TRUE)
   if (dep_image_id != setup_image_id) {
     on.exit(docker_rmi(dep_image_id), add = TRUE)
   }
@@ -41,7 +42,7 @@ build_linux_binary <- function(
   system_information(path, dep_image_id)
 
   ## Run the check
-  finished_cont_id <- run_check(path, dep_image_id)
+  finished_cont_id <- run_check(path, dep_image_id, user = docker_user)
 
   ## Save the built binary to a repository, optionally
   save_binary_to_repo(path, finished_cont_id)
