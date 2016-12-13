@@ -58,7 +58,7 @@ build_linux_binary <- function(
   ## Run the check
   message("* Running check .................... ", appendLF = FALSE)
   finished_image_id <- run_check(path, dep_image_id, user = docker_user,
-                                 args = "--build")
+                                 args = "")
   cleanme <- c(cleanme, finished_image_id)
   message(substring(finished_image_id, 1, 40))
 
