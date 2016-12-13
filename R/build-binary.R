@@ -62,9 +62,9 @@ build_linux_binary <- function(
   cleanme <- c(cleanme, finished_image_id)
   message(substring(finished_image_id, 1, 40))
 
-  ## Save the built binary to a repository, optionally
-  message("* Saving binary .................... ", appendLF = FALSE)
-  save_binary_to_repo(path, finished_image_id, user = docker_user)
+  ## Save artifacts
+  message("* Saving artifacts ................. ", appendLF = FALSE)
+  save_artifacts(finished_image_id, "artifacts", user = docker_user)
   message("DONE")
 }
 
