@@ -5,7 +5,7 @@
 \title{Build a binary from a local package tree}
 \usage{
 build_linux_binary(path = ".", image = "rhub/ubuntu-gcc-release",
-  platform = NULL, docker_user = "docker")
+  platform = NULL, docker_user = "docker", repo = NULL)
 }
 \description{
 Build a binary from a local package tree

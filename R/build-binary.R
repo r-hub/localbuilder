@@ -2,12 +2,14 @@
 #' Build a binary from a local package tree
 #'
 #' @export
+#' @importFrom cranlike add_PACKAGES
 
 build_linux_binary <- function(
   path = ".",
   image = "rhub/ubuntu-gcc-release",
   platform = NULL,
-  docker_user = "docker") {
+  docker_user = "docker",
+  repo = NULL) {
 
   cleanme <- character()
   on.exit(
@@ -56,16 +58,25 @@ build_linux_binary <- function(
   message("DONE")
 
   ## Run the check
-  message("* Running check .................... ", appendLF = FALSE)
-  finished_image_id <- run_check(path, dep_image_id, user = docker_user,
-                                 args = "")
+  message("* Running install & build .......... ", appendLF = FALSE)
+  finished_image_id <- run_install(path, dep_image_id, user = docker_user,
+                                   args = "--build")
   cleanme <- c(cleanme, finished_image_id)
   message(substring(finished_image_id, 1, 40))
 
   ## Save artifacts
-  message("* Saving artifacts ................. ", appendLF = FALSE)
-  save_artifacts(finished_image_id, "artifacts", user = docker_user)
-  message("DONE")
+  if (!is.null(repo)) {
+    message("* Saving artifacts ................. ", appendLF = FALSE)
+    repo_file_dir <- file.path(repo, "src", "contrib")
+    dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+    files <- save_artifacts(
+      finished_image_id,
+      repo_file_dir,
+      user = docker_user
+    )
+    add_PACKAGES(files, repo_file_dir)
+    message("DONE")
+  }
 }
 
 get_platform <- function(image_id) {

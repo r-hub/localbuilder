@@ -43,3 +43,7 @@ docker_rm <- function(containers) {
 docker_rmi <- function(images) {
   docker("rmi", images)
 }
+
+docker_cp <- function(source, target) {
+  docker("cp", source, target)
+}
