@@ -12,8 +12,8 @@ knitr::opts_chunk$set(
 
 > Build R Binary Packages for Multiple Platforms
 
-[![Linux Build Status](https://travis-ci.org//localbuilder.svg?branch=master)](https://travis-ci.org//localbuilder)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/github//localbuilder?svg=true)](https://ci.appveyor.com/project//localbuilder)
+[![Linux Build Status](https://travis-ci.org/r-hub/localbuilder.svg?branch=master)](https://travis-ci.org/r-hub/localbuilder)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-hub/localbuilder?svg=true)](https://ci.appveyor.com/project/gaborcsardi/localbuilder)
 [![](http://www.r-pkg.org/badges/version/localbuilder)](http://www.r-pkg.org/pkg/localbuilder)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/localbuilder)](http://www.r-pkg.org/pkg/localbuilder)
 
