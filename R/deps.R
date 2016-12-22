@@ -9,7 +9,7 @@
 #'
 #' @keywords internal
 
-install_deps <- function(path, image_id, user, dependencies) {
+install_deps <- function(path, image_id, user, dependencies, repo) {
 
   ## Create R script to run
   rfile <- tempfile(fileext = ".R")
@@ -25,6 +25,7 @@ install_deps <- function(path, image_id, user, dependencies) {
   ## We need these files in the container
   pkg_vol <- sprintf("%s:/%s", normalizePath(path), basename(path))
   rfile_vol <- sprintf("%s:/%s", rfile, basename(rfile))
+  repo_vol <- sprintf("%s:/%s", normalizePath(repo), "local")
 
   new_id <- random_id()
   on.exit(try(docker_rm(new_id), silent = TRUE), add = TRUE)
@@ -32,7 +33,7 @@ install_deps <- function(path, image_id, user, dependencies) {
     image_id,
     name = new_id,
     user = user,
-    volumes = c(pkg_vol, rfile_vol),
+    volumes = c(pkg_vol, rfile_vol, repo_vol),
     command = c("bash", "-l", "-c",
       sprintf("$RBINARY -f /%s", basename(rfile)))
   )

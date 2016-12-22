@@ -8,7 +8,8 @@ setup_for_r <- function(image_id, user, repos = NULL) {
 
   ## Create file to run
   template_data <- list(
-    "cran-repo" = repos
+    "cran-repo" = repos,
+    "local-repo" = "file:///local"
   )
   shfile <- do_template("setup.sh", template_data)
   on.exit(unlink(shfile), add = TRUE)

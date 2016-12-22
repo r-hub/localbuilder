@@ -1,4 +1,4 @@
 
-system_information <- function(path, image_id) {
+system_information <- function(path, image_id, repo) {
   ## TODO
 }

@@ -10,9 +10,15 @@ if [[ -z "$RBINARY" ]]; then
 fi
 . ~/.bashrc
 
-# Set up CRAN repo --------------------------------------------------------
+# Set up repos: CRAN, BioC, local -----------------------------------------
+
+## It seems that BiocInstaller removes custom repos, so we add our local
+## repo at the end. We add it as the first repo, so that it will be used
+## by default.
 
 echo "options(repos = c(CRAN = '{{{ cran-repo }}}'))" >> ~/.Rprofile
 $RBINARY -e "source('https://bioconductor.org/biocLite.R')"
 echo "options(repos = BiocInstaller::biocinstallRepos())" >> ~/.Rprofile
 echo "unloadNamespace('BiocInstaller')" >> ~/.Rprofile
+echo "options(repos = c(LOCAL = '{{{ local-repo }}}', getOption('repos')))" \
+     >> ~/.Rprofile

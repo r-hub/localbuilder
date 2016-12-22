@@ -8,7 +8,7 @@ build_linux_binary <- function(
   package,
   image = "rhub/ubuntu-gcc-release",
   docker_user = "docker",
-  repo = NULL) {
+  repo = ".") {
 
   cleanme <- character()
   on.exit(
@@ -24,7 +24,7 @@ build_linux_binary <- function(
   ## Get the R-hub platform id from the image, we need this to query the
   ## system reqirements for the platform
   message("* Querying platform ................ ", appendLF = FALSE)
-  platform <- platform %||% get_platform(image_id)
+  platform <- get_platform(image_id)
   message(platform)
 
   ## Query system requirements
@@ -47,35 +47,33 @@ build_linux_binary <- function(
   ## Install dependent R packages, create new image
   message("* Installing dependencies .......... ", appendLF = FALSE)
   dep_image_id <- install_deps(package, setup_image_id, user = docker_user,
-                               dependencies = TRUE)
+                               dependencies = NA, repo = repo)
   cleanme <- c(cleanme, dep_image_id)
   message(substring(dep_image_id, 1, 40))
 
   ## System information
   message("* Querying system information ...... ", appendLF = FALSE)
-  system_information(package, dep_image_id)
+  system_information(package, dep_image_id, repo = repo)
   message("DONE")
 
-  ## Run the check
+  ## Run the build
   message("* Running install & build .......... ", appendLF = FALSE)
   finished_image_id <- run_install(package, dep_image_id, user = docker_user,
-                                   args = "--build")
+                                   args = "--build", repo = repo)
   cleanme <- c(cleanme, finished_image_id)
   message(substring(finished_image_id, 1, 40))
 
   ## Save artifacts
-  if (!is.null(repo)) {
-    message("* Saving artifacts ................. ", appendLF = FALSE)
-    repo_file_dir <- file.path(repo, "src", "contrib")
-    dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
-    files <- save_artifacts(
-      finished_image_id,
-      repo_file_dir,
-      user = docker_user
-    )
-    add_PACKAGES(files, repo_file_dir)
-    message("DONE")
-  }
+  message("* Saving artifacts ................. ", appendLF = FALSE)
+  repo_file_dir <- file.path(repo, "src", "contrib")
+  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+  files <- save_artifacts(
+    finished_image_id,
+    repo_file_dir,
+    user = docker_user
+  )
+  add_PACKAGES(files, repo_file_dir)
+  message("DONE")
 }
 
 get_platform <- function(image_id) {

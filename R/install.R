@@ -1,9 +1,10 @@
 
-run_install <- function(path, image_id, user, args) {
+run_install <- function(path, image_id, user, args, repo) {
 
   args <- paste(args, collapse = " ")
 
   pkg_vol <- sprintf("%s:/%s", normalizePath(path), basename(path))
+  repo_vol <- sprintf("%s:/%s", normalizePath(repo), "local")
 
   new_id <- random_id()
   on.exit(try(docker_rm(new_id), silent = TRUE), add = TRUE)
@@ -13,7 +14,7 @@ run_install <- function(path, image_id, user, args) {
     name = new_id,
     user = user,
     workdir = paste0("/home/", user),
-    volumes = pkg_vol,
+    volumes = c(pkg_vol, repo_vol),
     command = c("bash", "-l", "-c",
       sprintf("$RBINARY CMD INSTALL -l ~/R %s /%s", args, basename(path)))
   )
