@@ -1,13 +1,12 @@
-
-#' Build a binary from a local package tree
+	
+#' Build a binary from a source package
 #'
 #' @export
 #' @importFrom cranlike add_PACKAGES
 
 build_linux_binary <- function(
-  path = ".",
+  package,
   image = "rhub/ubuntu-gcc-release",
-  platform = NULL,
   docker_user = "docker",
   repo = NULL) {
 
@@ -30,7 +29,7 @@ build_linux_binary <- function(
 
   ## Query system requirements
   message("* Querying system requirements ..... ", appendLF = FALSE)
-  sysreqs <- get_system_requirements(path, platform)
+  sysreqs <- get_system_requirements(package, platform)
   message("DONE")
 
   ## Install system requirements, create new image
@@ -47,19 +46,19 @@ build_linux_binary <- function(
 
   ## Install dependent R packages, create new image
   message("* Installing dependencies .......... ", appendLF = FALSE)
-  dep_image_id <- install_deps(path, setup_image_id, user = docker_user,
+  dep_image_id <- install_deps(package, setup_image_id, user = docker_user,
                                dependencies = TRUE)
   cleanme <- c(cleanme, dep_image_id)
   message(substring(dep_image_id, 1, 40))
 
   ## System information
   message("* Querying system information ...... ", appendLF = FALSE)
-  system_information(path, dep_image_id)
+  system_information(package, dep_image_id)
   message("DONE")
 
   ## Run the check
   message("* Running install & build .......... ", appendLF = FALSE)
-  finished_image_id <- run_install(path, dep_image_id, user = docker_user,
+  finished_image_id <- run_install(package, dep_image_id, user = docker_user,
                                    args = "--build")
   cleanme <- c(cleanme, finished_image_id)
   message(substring(finished_image_id, 1, 40))

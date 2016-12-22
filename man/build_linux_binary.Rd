@@ -2,12 +2,12 @@
 % Please edit documentation in R/build-binary.R
 \name{build_linux_binary}
 \alias{build_linux_binary}
-\title{Build a binary from a local package tree}
+\title{Build a binary from a source package}
 \usage{
-build_linux_binary(path = ".", image = "rhub/ubuntu-gcc-release",
-  platform = NULL, docker_user = "docker", repo = NULL)
+build_linux_binary(package, image = "rhub/ubuntu-gcc-release",
+  docker_user = "docker", repo = NULL)
 }
 \description{
-Build a binary from a local package tree
+Build a binary from a source package
 }
 
