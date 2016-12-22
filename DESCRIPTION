@@ -11,8 +11,15 @@ URL: https://github.com/r-hub/localbuilder
 BugReports: https://github.com/r-hub/localbuilder/issues
 RoxygenNote: 5.0.1
 Imports:
+    cranlike,
     processx,
+    sysreqs,
+    tools,
     whisker
+Remotes:
+    r-hub/cranlike,
+    r-pkgs/processx,
+    r-hub/sysreqs
 Suggests:
     testthat
 Encoding: UTF-8
