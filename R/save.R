@@ -11,7 +11,7 @@ save_artifacts <- function(image_id, path, user) {
     command = c("bash", "-l", "-c", "ls")
   )$stdout
 
-  pkgs <- grep("\\.tar\\.gz$", files)
+  pkgs <- grep("\\.tar\\.gz$", files, value = TRUE)
 
   for (pkg in pkgs) {
     docker_cp(
