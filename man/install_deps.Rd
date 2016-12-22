@@ -4,7 +4,7 @@
 \alias{install_deps}
 \title{Install dependencies, create a new Docker image}
 \usage{
-install_deps(path, image_id, user, dependencies)
+install_deps(path, image_id, user, dependencies, repo)
 }
 \arguments{
 \item{path}{Path to a tarball.}

@@ -13,6 +13,8 @@ RoxygenNote: 5.0.1
 Imports:
     crandeps,
     cranlike,
+    curl,
+    jsonlite,
     processx,
     sysreqs,
     tools,

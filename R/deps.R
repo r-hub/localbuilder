@@ -16,7 +16,9 @@ install_deps <- function(path, image_id, user, dependencies, repo) {
   on.exit(unlink(rfile), add = TRUE)
   cat(
     sep = "\n", file = rfile,
-    'source("https://install-github.me/r-pkgs/remotes")',
+    'if (!requireNamespace("remotes", quietly = TRUE)) {',
+    '  source("https://install-github.me/r-pkgs/remotes")',
+    '}',
     sprintf('remotes::install_deps("/%s", dependencies = %s)',
             basename(path), as.character(dependencies))
   )

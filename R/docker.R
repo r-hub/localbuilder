@@ -37,11 +37,11 @@ docker_commit <- function(container) {
 }
 
 docker_rm <- function(containers) {
-  docker("rm", containers)
+  if (length(containers)) docker("rm", containers)
 }
 
 docker_rmi <- function(images) {
-  docker("rmi", images)
+ if (length(images)) docker("rmi", images)
 }
 
 docker_cp <- function(source, target) {

@@ -5,7 +5,7 @@
 \title{Build a binary from a source package}
 \usage{
 build_linux_binary(package, image = "rhub/ubuntu-gcc-release",
-  docker_user = "docker", repo = NULL)
+  docker_user = "docker", repo = ".")
 }
 \description{
 Build a binary from a source package

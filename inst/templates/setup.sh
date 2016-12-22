@@ -22,3 +22,13 @@ echo "options(repos = BiocInstaller::biocinstallRepos())" >> ~/.Rprofile
 echo "unloadNamespace('BiocInstaller')" >> ~/.Rprofile
 echo "options(repos = c(LOCAL = '{{{ local-repo }}}', getOption('repos')))" \
      >> ~/.Rprofile
+
+# Install sysreqs and remotes, if requested -------------------------------
+
+if [[ "{{{ sysreqs }}}" == "TRUE" ]]; then
+    $RBINARY -e "source('https://install-github.me/r-hub/sysreqs')"
+fi
+
+if [[ "{{{ remotes }}}" == "TRUE" ]]; then
+    $RBINARY -e "source('https://install-github.me/r-pkgs/remotes')"
+fi

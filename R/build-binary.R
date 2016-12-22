@@ -40,7 +40,7 @@ build_linux_binary <- function(
 
   ## Setup R, create package library directory, profile, etc.
   message("* Setting up R environment ......... ", appendLF = FALSE)
-  setup_image_id <- setup_for_r(prov_image_id, user = docker_user)
+  setup_image_id <- setup_for_r(prov_image_id, user = docker_user, repo = repo)
   cleanme <- c(cleanme, setup_image_id)
   message(substring(setup_image_id, 1, 40))
 
