@@ -27,6 +27,7 @@ rebuild_cran <- function(
   ## Make sure repo is up to date
   message("* Updateing repo directory ........... ", appendLF = FALSE)
   repo_file_dir <- file.path(repo, "src", "contrib")
+  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
   update_PACKAGES(repo_file_dir)
   message("DONE")
 
