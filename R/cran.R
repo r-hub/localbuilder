@@ -18,14 +18,6 @@ rebuild_cran <- function(
     packages <- outdated_packages(repo, compiled_only)
   }
 
-  cleanme <- character()
-  if (cleanup) {
-    on.exit(
-      try(docker_rmi(setdiff(unique(cleanme), image)), silent = TRUE),
-      add = TRUE
-    )
-  }
-
   repos <- getOption("repos")
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
      options(repos = c(CRAN = "https://cran.r-hub.io"))
@@ -36,6 +28,14 @@ rebuild_cran <- function(
 
 do_rebuild_cran <- function(image, docker_user, repo, packages,
                             compiled_only, cleanup) {
+
+  cleanme <- character()
+  if (cleanup) {
+    on.exit(
+      try(docker_rmi(setdiff(unique(cleanme), image)), silent = TRUE),
+      add = TRUE
+    )
+  }
 
   ## Make sure that the image is available
   message("* Getting docker image ............... ", appendLF = FALSE)
