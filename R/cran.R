@@ -8,8 +8,13 @@ rebuild_cran <- function(
   image = "rhub/ubuntu-gcc-release",
   docker_user = "docker",
   repo = ".",
+  packages = NULL,
   compiled_only = TRUE,
   cleanup = TRUE) {
+
+  if (is.null(packages)) {
+    packages <- outdated_packages(repo, compiled_only)
+  }
 
   cleanme <- character()
   if (cleanup) {
@@ -24,12 +29,11 @@ rebuild_cran <- function(
      options(repos = c(CRAN = "https://cran.r-hub.io"))
   }
 
-  ## Make sure repo is up to date
-  message("* Updateing repo directory ........... ", appendLF = FALSE)
-  repo_file_dir <- file.path(repo, "src", "contrib")
-  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
-  update_PACKAGES(repo_file_dir)
-  message("DONE")
+  do_rebuild_cran(image, docker_user, repo, packages, compiled_only, cleanup)
+}
+
+do_rebuild_cran <- function(image, docker_user, repo, packages,
+                            compiled_only, cleanup) {
 
   ## Make sure that the image is available
   message("* Getting docker image ............... ", appendLF = FALSE)
@@ -48,44 +52,12 @@ rebuild_cran <- function(
   system_information(package, setup_image_id, repo = repo)
   message("DONE")
 
-  ## Calculating topological package order
-  message("* Calculating package order .......... ", appendLF = FALSE)
-  order <- cran_topo_sort()
-  message("DONE")
+  message("* Need to build ", length(packages), " packages")
 
-  ## Querying packages with compiled code
-  if (compiled_only) {
-    message("* Querying packages with compiled code ", appendLF = FALSE)
-    compiled <- fromJSON("https://crandb.r-pkg.org/-/needscompilation")
-    message("DONE")
-  }
-
-  message("* Querying current package versions .. ", appendLF = FALSE)
-  recent <- fromJSON("https://crandb.r-pkg.org/-/desc")
-  recent <- vapply(recent, "[[", "", "version")
-  if (compiled_only) recent <- recent[compiled]
-  message("DONE")
-
-  message("* Querying repo package versions ..... ", appendLF = FALSE)
-  local <- package_versions(repo_file_dir)
-  message("DONE")
-
-  toinstall <- setdiff(names(recent), local$Package)
-  common <- intersect(names(recent), local$Package)
-  outofdate <- common[package_version(local$Version[match(common, local$Package)]) <
-                      package_version(recent[common])]
-  toinstall <- c(toinstall, outofdate)
-  message("* Need to build ", length(toinstall), " packages")
-
-  ## Need them in the right order. We also make sure that we build the ones
-  ## that are were added since we calculated the order
-  toinstall2 <- order[order %in% toinstall]
-  toinstall2 <- c(toinstall2, setdiff(toinstall, toinstall2))
-
-  for (i in seq_along(toinstall2)) {
-    pkg <- toinstall2[i]
+  for (i in seq_along(packages)) {
+    pkg <- packages[i]
     version <- recent[pkg]
-    message(" ** Building package [", i, "/", length(toinstall2), "]: ", pkg)
+    message(" ** Building package [", i, "/", length(pacakges), "]: ", pkg)
     tryCatch({
         build_cran_package(pkg, version, image = setup_image_id,
           docker_user = docker_user, repo = repo)
@@ -176,4 +148,49 @@ download_cran_package <- function(package, version) {
   }
 
   path
+}
+
+outdated_packages <- function(repo, compiled_only) {
+
+  ## Make sure repo is up to date
+  message("* Updateing repo directory ........... ", appendLF = FALSE)
+  repo_file_dir <- file.path(repo, "src", "contrib")
+  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+  update_PACKAGES(repo_file_dir)
+  message("DONE")
+
+  ## Calculating topological package order
+  message("* Calculating package order .......... ", appendLF = FALSE)
+  order <- cran_topo_sort()
+  message("DONE")
+
+  ## Querying packages with compiled code
+  if (compiled_only) {
+    message("* Querying packages with compiled code ", appendLF = FALSE)
+    compiled <- fromJSON("https://crandb.r-pkg.org/-/needscompilation")
+    message("DONE")
+  }
+
+  message("* Querying current package versions .. ", appendLF = FALSE)
+  recent <- fromJSON("https://crandb.r-pkg.org/-/desc")
+  recent <- vapply(recent, "[[", "", "version")
+  if (compiled_only) recent <- recent[compiled]
+  message("DONE")
+
+  message("* Querying repo package versions ..... ", appendLF = FALSE)
+  local <- package_versions(repo_file_dir)
+  message("DONE")
+
+  toinstall <- setdiff(names(recent), local$Package)
+  common <- intersect(names(recent), local$Package)
+  outofdate <- common[package_version(local$Version[match(common, local$Package)]) <
+                      package_version(recent[common])]
+  toinstall <- c(toinstall, outofdate)
+
+  ## Need them in the right order. We also make sure that we build the ones
+  ## that are were added since we calculated the order
+  toinstall2 <- order[order %in% toinstall]
+  toinstall2 <- c(toinstall2, setdiff(toinstall, toinstall2))
+
+  toinstall2
 }
