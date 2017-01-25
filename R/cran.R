@@ -65,7 +65,7 @@ do_rebuild_cran <- function(image, docker_user, repo, packages,
   for (i in seq_along(packages)) {
     pkg <- packages[i]
     version <- recent[pkg]
-    message(" ** Building package [", i, "/", length(pacakges), "]: ", pkg)
+    message(" ** Building package [", i, "/", length(packages), "]: ", pkg)
     tryCatch({
         build_cran_package(pkg, version, image = setup_image_id,
           docker_user = docker_user, repo = repo)
