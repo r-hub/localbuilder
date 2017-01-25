@@ -12,6 +12,8 @@ rebuild_cran <- function(
   compiled_only = TRUE,
   cleanup = TRUE) {
 
+  ensure_repo_directory(repo)
+
   if (is.null(packages)) {
     packages <- outdated_packages(repo, compiled_only)
   }
@@ -152,13 +154,6 @@ download_cran_package <- function(package, version) {
 
 outdated_packages <- function(repo, compiled_only) {
 
-  ## Make sure repo is up to date
-  message("* Updateing repo directory ........... ", appendLF = FALSE)
-  repo_file_dir <- file.path(repo, "src", "contrib")
-  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
-  update_PACKAGES(repo_file_dir)
-  message("DONE")
-
   ## Calculating topological package order
   message("* Calculating package order .......... ", appendLF = FALSE)
   order <- cran_topo_sort()
@@ -193,4 +188,13 @@ outdated_packages <- function(repo, compiled_only) {
   toinstall2 <- c(toinstall2, setdiff(toinstall, toinstall2))
 
   toinstall2
+}
+
+ensure_repo_directory <- function(repo) {
+  ## Make sure repo is up to date
+  message("* Updating repo directory ........... ", appendLF = FALSE)
+  repo_file_dir <- file.path(repo, "src", "contrib")
+  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+  update_PACKAGES(repo_file_dir)
+  message("DONE")
 }
