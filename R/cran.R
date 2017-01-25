@@ -174,6 +174,7 @@ outdated_packages <- function(repo, compiled_only, recent) {
   }
 
   message("* Querying repo package versions ..... ", appendLF = FALSE)
+  repo_file_dir <- file.path(repo, "src", "contrib")
   local <- package_versions(repo_file_dir)
   message("DONE")
 
