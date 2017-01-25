@@ -14,8 +14,13 @@ rebuild_cran <- function(
 
   ensure_repo_directory(repo)
 
+  message("* Querying current package versions .. ", appendLF = FALSE)
+  recent <- fromJSON("https://crandb.r-pkg.org/-/desc")
+  recent <- vapply(recent, "[[", "", "version")
+  message("DONE")
+
   if (is.null(packages)) {
-    packages <- outdated_packages(repo, compiled_only)
+    packages <- outdated_packages(repo, compiled_only, recent)
   }
 
   repos <- getOption("repos")
@@ -23,11 +28,12 @@ rebuild_cran <- function(
      options(repos = c(CRAN = "https://cran.r-hub.io"))
   }
 
-  do_rebuild_cran(image, docker_user, repo, packages, compiled_only, cleanup)
+  do_rebuild_cran(image, docker_user, repo, packages, compiled_only,
+                  cleanup, recent)
 }
 
 do_rebuild_cran <- function(image, docker_user, repo, packages,
-                            compiled_only, cleanup) {
+                            compiled_only, cleanup, recent) {
 
   cleanme <- character()
   if (cleanup) {
@@ -152,7 +158,7 @@ download_cran_package <- function(package, version) {
   path
 }
 
-outdated_packages <- function(repo, compiled_only) {
+outdated_packages <- function(repo, compiled_only, recent) {
 
   ## Calculating topological package order
   message("* Calculating package order .......... ", appendLF = FALSE)
@@ -164,13 +170,8 @@ outdated_packages <- function(repo, compiled_only) {
     message("* Querying packages with compiled code ", appendLF = FALSE)
     compiled <- fromJSON("https://crandb.r-pkg.org/-/needscompilation")
     message("DONE")
+    if (compiled_only) recent <- recent[compiled]
   }
-
-  message("* Querying current package versions .. ", appendLF = FALSE)
-  recent <- fromJSON("https://crandb.r-pkg.org/-/desc")
-  recent <- vapply(recent, "[[", "", "version")
-  if (compiled_only) recent <- recent[compiled]
-  message("DONE")
 
   message("* Querying repo package versions ..... ", appendLF = FALSE)
   local <- package_versions(repo_file_dir)
