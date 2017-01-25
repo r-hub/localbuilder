@@ -108,6 +108,10 @@ build_cran_package <- function(package, version, image, docker_user, repo) {
 
   message(" ** Downloading package .............. ", appendLF = FALSE)
   package <- download_cran_package(package, version)
+  if (is.null(package)) {
+    message("FAILED")
+    stop("Download ", package, " failed")
+  }
   message("DONE")
 
   message(" ** Querying platform ................ ", appendLF = FALSE)
