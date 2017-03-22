@@ -14,4 +14,3 @@ Id of the new image, or the old image if no sysreqs
 Create another image, with sysreqs installed
 }
 \keyword{internal}
-

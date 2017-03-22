@@ -1,0 +1,2 @@
+
+mydata <- new.env()

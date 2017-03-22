@@ -19,3 +19,28 @@ random_id <- function(length = 16) {
     collapse = ""
   )
 }
+
+cat0 <- function(..., sep = "") {
+  cat(..., sep = sep)
+}
+
+format_iso_8601 <- function (date) {
+  format(as.POSIXlt(date, tz = "UTC"), "%Y-%m-%dT%H:%M:%S+00:00")
+}
+
+random_string <- function(length = 6) {
+  paste(sample(c(letters, 0:9), length, replace = TRUE), collapse = "")
+}
+
+valid_package_archive_name <- paste0(
+  "^(?<package>[[:alpha:]][[:alnum:].]*[[:alnum:]])",
+  "_",
+  "(?<version>[0-9]+[-\\.][0-9]+)",
+  "(?<arch>[-\\.][0-9]+)*(.*)?",
+  "(?<extension>\\.tar\\.gz|\\.tgz|\\.zip)",
+  "$"
+)
+
+is_valid_package_archive_name <- function(x) {
+  grepl(valid_package_archive_name, x, perl = TRUE)
+}

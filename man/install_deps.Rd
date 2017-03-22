@@ -16,4 +16,3 @@ We share the tarball, and use the new remotes::install_deps()
 function.
 }
 \keyword{internal}
-

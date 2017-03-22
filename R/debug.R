@@ -1,4 +1,4 @@
 
 is_debugged <- function() {
-  Sys.getenv("DEBUG", "") == "yes"
+  isTRUE(mydata$debug)
 }

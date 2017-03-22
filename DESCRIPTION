@@ -9,20 +9,26 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/r-hub/localbuilder
 BugReports: https://github.com/r-hub/localbuilder/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Imports:
+    clisymbols,
     crandeps,
     cranlike,
+    crayon,
     curl,
     jsonlite,
+    prettyunits,
     processx,
+    rappdirs,
+    rematch2,
     sysreqs,
     tools,
     whisker
 Remotes:
+    mangothecat/rematch2,
     r-hub/crandeps,
     r-hub/cranlike,
-    r-pkgs/processx,
+    r-pkgs/processx@c,
     r-hub/sysreqs
 Suggests:
     testthat
