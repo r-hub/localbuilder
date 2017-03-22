@@ -21,10 +21,12 @@ Imports:
     processx,
     rappdirs,
     rematch2,
+    statusbar,
     sysreqs,
     tools,
     whisker
 Remotes:
+    gaborcsardi/statusbar,
     mangothecat/rematch2,
     r-hub/crandeps,
     r-hub/cranlike,

@@ -3,6 +3,8 @@
 
 `%&&%` <- function(l, r) if (is.null(l)) NULL else r
 
+#' @importFrom utils untar
+
 description_from_tarball <- function(path) {
   files <- untar(path, list = TRUE, tar = "internal")
   desc <- grep("^[^/]+/DESCRIPTION$", files, value = TRUE)

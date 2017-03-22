@@ -1,6 +1,14 @@
 
 #' Build a binary from a source package
 #'
+#' @param package Path to a package archive to build.
+#' @param image Docker image to use.
+#' @param docker_user Username to use within the Docker container.
+#' @param repo CRAN-like repository that has the binary packages.
+#' @param logfile The log file of the build. The default will choose
+#'   a random name in the user's log directory.
+#' @param debug Whether to show all build output. The log file always
+#'   contains the full output.
 #' @export
 #' @importFrom cranlike add_PACKAGES
 #' @importFrom statusbar status_log

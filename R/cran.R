@@ -1,4 +1,18 @@
 
+#' Build binary packages for all or part of CRAN
+#'
+#' @param image The image to use.
+#' @param docker_user The user to use in the Docker container.
+#' @param repo The CRAN-like repository that contains the binary packages.
+#' @param packages The CRAN packages to build. If it is `NULL`, then
+#'   all out of date packages that require compilation, will be built.
+#'   See also the `compiled_only` argument to force building packages that
+#'   do not require compilation.
+#' @param compiled_only Whether to build only CRAN packages that require
+#'   compilation.
+#' @param cleanup Whether to clean up the Docker containers and images
+#'   after the builds.
+#'
 #' @export
 #' @importFrom cranlike update_PACKAGES package_versions
 #' @importFrom crandeps cran_topo_sort
@@ -57,7 +71,7 @@ do_rebuild_cran <- function(image, docker_user, repo, packages,
 
   ## System information
   message("* Querying system information ........ ", appendLF = FALSE)
-  system_information(package, setup_image_id, repo = repo)
+  system_information(packages, setup_image_id, repo = repo)
   message("DONE")
 
   message("* Need to build ", length(packages), " packages")
