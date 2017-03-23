@@ -2,7 +2,6 @@
 
 export(build_linux_binary)
 export(rebuild_cran)
-import(backports)
 importFrom(clisymbols,symbol)
 importFrom(crandeps,cran_topo_sort)
 importFrom(cranlike,add_PACKAGES)
