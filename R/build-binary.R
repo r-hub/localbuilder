@@ -11,7 +11,7 @@
 #'   contains the full output.
 #' @export
 #' @importFrom cranlike add_PACKAGES
-#' @importFrom statusbar status_log
+#' @importFrom statusbar status_log set_logfile
 #' @importFrom prettyunits pretty_dt
 
 build_linux_binary <- function(
@@ -43,7 +43,6 @@ build_linux_binary <- function(
     try(docker_rmi(setdiff(unique(cleanme), image)), silent = TRUE),
     add = TRUE
   )
-
 
   ## Make sure that the image is available
   image_id <- with_status(
