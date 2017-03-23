@@ -25,6 +25,9 @@ compilation.}
 
 \item{cleanup}{Whether to clean up the Docker containers and images
 after the builds.}
+
+\item{logfile}{The log file of the build. The default will choose
+a random name in the user's log directory.}
 }
 \description{
 Build binary packages for all or part of CRAN
