@@ -12,11 +12,14 @@
 #'   compilation.
 #' @param cleanup Whether to clean up the Docker containers and images
 #'   after the builds.
+#' @param logfile The log file of the build. The default will choose
+#'   a random name in the user's log directory.
 #'
 #' @export
 #' @importFrom cranlike update_PACKAGES package_versions
 #' @importFrom crandeps cran_topo_sort
 #' @importFrom jsonlite fromJSON
+#' @importFrom statusbar set_logfile status_sub
 
 rebuild_cran <- function(
   image = "rhub/ubuntu-gcc-release",
@@ -24,17 +27,30 @@ rebuild_cran <- function(
   repo = ".",
   packages = NULL,
   compiled_only = TRUE,
-  cleanup = TRUE) {
+  cleanup = TRUE,
+  logfile = new_cran_logfile()) {
+
+  start_time <- proc.time()
+
+  set_logfile(logfile)
+
+  status_header_line()
+  status_header(symbol$pointer, " Building CRAN packages")
+  status_header("  Log: ", sQuote(logfile))
+  status_header_line()
 
   ensure_repo_directory(repo)
 
-  message("* Querying current package versions .. ", appendLF = FALSE)
-  recent <- fromJSON("https://crandb.r-pkg.org/-/desc")
-  recent <- vapply(recent, "[[", "", "version")
-  message("DONE")
+  recent <- with_status({
+    x <- fromJSON("https://crandb.r-pkg.org/-/desc")
+    vapply(x, "[[", "", "version")
+  }, "Querying current package versions")
 
   if (is.null(packages)) {
-    packages <- outdated_packages(repo, compiled_only, recent)
+    status_log(paste(symbol$info, "Work out packages and their order"))
+    packages <- status_sub(
+      outdated_packages(repo, compiled_only, recent)
+    )
   }
 
   repos <- getOption("repos")
@@ -44,6 +60,15 @@ rebuild_cran <- function(
 
   do_rebuild_cran(image, docker_user, repo, packages, compiled_only,
                   cleanup, recent)
+
+  end_time <- proc.time()
+  secs <- as.difftime((end_time - start_time)[["elapsed"]], units = "secs")
+
+  status_header_line()
+  status_header("  Finished in ", pretty_dt(secs))
+  status_header("  Log: ", sQuote(logfile))
+
+  invisible()
 }
 
 do_rebuild_cran <- function(image, docker_user, repo, packages,
@@ -58,41 +83,53 @@ do_rebuild_cran <- function(image, docker_user, repo, packages,
   }
 
   ## Make sure that the image is available
-  message("* Getting docker image ............... ", appendLF = FALSE)
-  image_id <- docker_ensure_image(image)
-  message(substring(image_id, 1, 40))
+  image_id <- with_status(
+    x <- docker_ensure_image(image),
+    "Getting docker image",
+    substring(x, 1, 40)
+  )
 
   ## Create a container to do all builds, we set up R, and install some packages
-  message("* Setting up R environment ........... ", appendLF = FALSE)
-  setup_image_id <- setup_for_r(image_id, user = docker_user, repo = repo,
-                                sysreqs = TRUE, remotes = TRUE)
+  setup_image_id <- with_status(
+    x <- setup_for_r(image_id, user = docker_user, repo = repo,
+                     sysreqs = TRUE, remotes = TRUE),
+    "Setting up R environment",
+    substring(x, 1, 40)
+  )
   cleanme <- c(cleanme, setup_image_id)
-  message(substring(setup_image_id, 1, 40))
 
   ## System information
-  message("* Querying system information ........ ", appendLF = FALSE)
-  system_information(packages, setup_image_id, repo = repo)
-  message("DONE")
+  with_status(
+    system_information(packages, setup_image_id, repo = repo),
+    "Querying system information"
+  )
 
-  message("* Need to build ", length(packages), " packages")
+  status_log("")
+  status_log(paste0(
+    symbol$info, " Need to build ", length(packages), " packages"
+  ))
 
   for (i in seq_along(packages)) {
     pkg <- packages[i]
     version <- recent[pkg]
-    message(" ** Building package [", i, "/", length(packages), "]: ", pkg)
+    msg <- paste0(" Building package [", i, "/",
+                  length(packages), "]: ", pkg)
+    status_log("")
+    status_log(paste(symbol$menu, msg))
+    ok <- TRUE
     tryCatch({
+      status_sub(
         build_cran_package(pkg, version, image = setup_image_id,
-          docker_user = docker_user, repo = repo)
-        message("DONE")
-      },
-      error = function(e) message("FAILED: ", e$message)
-    )
+                           docker_user = docker_user, repo = repo)
+      )
+    }, error = function(e) ok <<- FALSE)
+    status_log(paste(if (ok) symbol$tick else symbol$cross, msg, "DONE"))
   }
-
-  message("* DONE")
 }
 
 build_cran_package <- function(package, version, image, docker_user, repo) {
+
+  start_time <- proc.time()
 
   cleanme <- character()
   on.exit(
@@ -100,52 +137,65 @@ build_cran_package <- function(package, version, image, docker_user, repo) {
     add = TRUE
   )
 
-  message(" ** Downloading package .............. ", appendLF = FALSE)
-  package <- download_cran_package(package, version)
-  if (is.null(package)) {
-    message("FAILED")
-    stop("Download ", package, " failed")
-  }
-  message("DONE")
+  package <- try_silently(with_status(
+    download_cran_package(package, version) %||% stop("Download failed"),
+    "Downloading package",
+  ))
 
-  message(" ** Querying platform ................ ", appendLF = FALSE)
-  platform <- get_platform(image)
-  message(platform)
+  platform <- with_status(get_platform(image), "Querying platform")
 
-  message(" ** Querying system requirements ..... ", appendLF = FALSE)
-  sysreqs <- get_system_requirements(package, platform)
-  message("DONE")
+  sysreqs <- with_status(
+    get_system_requirements(package, platform),
+    "Querying system requirements"
+  )
 
-  ## Install system requirements, create new image
-  message(" ** Installing system requirements ... ", appendLF = FALSE)
-  prov_image_id <- install_system_requirements(image, sysreqs)
+  prov_image_id <- with_status(
+    x <- install_system_requirements(image, sysreqs),
+    "Installing system requirements",
+    done = substring(x, 1, 40)
+  )
   cleanme <- c(cleanme, prov_image_id)
-  message(substring(prov_image_id, 1, 40))
 
   ## Install dependent R packages, create new image
-  message(" ** Installing dependencies .......... ", appendLF = FALSE)
-  dep_image_id <- install_deps(package, prov_image_id, user = docker_user,
-                               dependencies = NA, repo = repo)
+  dep_image_id <- with_status(
+    x <- install_deps(package, prov_image_id, user = docker_user,
+                      dependencies = NA, repo = repo),
+    "Installing dependencies",
+    done = substring(x, 1, 40)
+  )
   cleanme <- c(cleanme, dep_image_id)
-  message(substring(dep_image_id, 1, 40))
 
   ## Run the build
-  message(" ** Running install & build .......... ", appendLF = FALSE)
-  finished_image_id <- run_install(package, dep_image_id, user = docker_user,
-                                   args = "--build", repo = repo)
+  finished_image_id <- with_status(
+    x <- run_install(package, dep_image_id, user = docker_user,
+                     args = "--build", repo = repo),
+    "Running install & build",
+    done = substring(x, 1, 40)
+  )
   cleanme <- c(cleanme, finished_image_id)
-  message(substring(finished_image_id, 1, 40))
+
 
   ## Save artifacts
-  message(" ** Saving artifacts ................. ", appendLF = FALSE)
-  repo_file_dir <- file.path(repo, "src", "contrib")
-  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
-  files <- save_artifacts(
-    finished_image_id,
-    repo_file_dir,
-    user = docker_user
+  with_status(
+    {
+      repo_file_dir <- file.path(repo, "src", "contrib")
+      dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+      files <- save_artifacts(
+        finished_image_id,
+        repo_file_dir,
+        user = docker_user
+      )
+      add_PACKAGES(files, repo_file_dir)
+    },
+    "Saving artifacts",
+    done = basename(files)
   )
-  add_PACKAGES(files, repo_file_dir)
+
+  end_time <- proc.time()
+  secs <- as.difftime((end_time - start_time)[["elapsed"]], units = "secs")
+  status_header("  Package finished in ", pretty_dt(secs))
+
+  invisible()
 }
 
 #' @importFrom curl curl_download
@@ -175,22 +225,23 @@ download_cran_package <- function(package, version) {
 outdated_packages <- function(repo, compiled_only, recent) {
 
   ## Calculating topological package order
-  message("* Calculating package order .......... ", appendLF = FALSE)
-  order <- cran_topo_sort()
-  message("DONE")
+  order <- with_status(
+    cran_topo_sort(),
+    "Calculating package order"
+  )
 
   ## Querying packages with compiled code
   if (compiled_only) {
-    message("* Querying packages with compiled code ", appendLF = FALSE)
-    compiled <- fromJSON("https://crandb.r-pkg.org/-/needscompilation")
-    message("DONE")
-    if (compiled_only) recent <- recent[compiled]
+    recent <- with_status(
+      recent[fromJSON("https://crandb.r-pkg.org/-/needscompilation")],
+      "Querying packages with compiled code"
+    )
   }
 
-  message("* Querying repo package versions ..... ", appendLF = FALSE)
-  repo_file_dir <- file.path(repo, "src", "contrib")
-  local <- package_versions(repo_file_dir)
-  message("DONE")
+  with_status({
+    repo_file_dir <- file.path(repo, "src", "contrib")
+    local <- package_versions(repo_file_dir)
+  }, "Querying repo package versions")
 
   toinstall <- setdiff(names(recent), local$Package)
   common <- intersect(names(recent), local$Package)
@@ -208,9 +259,9 @@ outdated_packages <- function(repo, compiled_only, recent) {
 
 ensure_repo_directory <- function(repo) {
   ## Make sure repo is up to date
-  message("* Updating repo directory ........... ", appendLF = FALSE)
-  repo_file_dir <- file.path(repo, "src", "contrib")
-  dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
-  update_PACKAGES(repo_file_dir)
-  message("DONE")
+  with_status({
+    repo_file_dir <- file.path(repo, "src", "contrib")
+    dir.create(repo_file_dir, recursive = TRUE, showWarnings = FALSE)
+    update_PACKAGES(repo_file_dir)
+  }, "Updating repo directory")
 }

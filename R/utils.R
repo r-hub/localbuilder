@@ -46,3 +46,7 @@ valid_package_archive_name <- paste0(
 is_valid_package_archive_name <- function(x) {
   grepl(valid_package_archive_name, x, perl = TRUE)
 }
+
+try_silently <- function(expr) {
+  try(expr, silent = TRUE)
+}

@@ -119,7 +119,7 @@ build_linux_binary <- function(
       add_PACKAGES(files, repo_file_dir)
     },
     "Saving artifacts",
-    substring(basename(files), 1, 40)
+    basename(files)
   )
 
   ## Otherwise it comes after the final messages

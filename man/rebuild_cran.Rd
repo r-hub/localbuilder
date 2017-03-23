@@ -5,7 +5,8 @@
 \title{Build binary packages for all or part of CRAN}
 \usage{
 rebuild_cran(image = "rhub/ubuntu-gcc-release", docker_user = "docker",
-  repo = ".", packages = NULL, compiled_only = TRUE, cleanup = TRUE)
+  repo = ".", packages = NULL, compiled_only = TRUE, cleanup = TRUE,
+  logfile = new_cran_logfile())
 }
 \arguments{
 \item{image}{The image to use.}
