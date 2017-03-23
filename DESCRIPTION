@@ -35,3 +35,4 @@ Remotes:
 Suggests:
     testthat
 Encoding: UTF-8
+SystemRequirements: Docker
