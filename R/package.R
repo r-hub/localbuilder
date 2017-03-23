@@ -6,5 +6,4 @@
 #'
 #' @docType package
 #' @name localbuilder
-#' @import backports
 NULL

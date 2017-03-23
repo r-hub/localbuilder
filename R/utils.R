@@ -50,3 +50,7 @@ is_valid_package_archive_name <- function(x) {
 try_silently <- function(expr) {
   try(expr, silent = TRUE)
 }
+
+strrep <- function (x, times) {
+  paste0(rep(x, times), collapse = "")
+}
